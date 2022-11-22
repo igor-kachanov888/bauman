@@ -1,0 +1,142 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
+<script src="https://cdn.plot.ly/plotly-2.16.1.min.js"></script>
+<title>Untitled Document</title>
+</head>
+
+<body bgcolor="#000000" text="#88F791" link="#33FF00" vlink="#666666" alink="#666600">
+
+      <form name="forma1" id="forma1" action="postdata" enctype="multipart/form-data" method="post" >
+         <p><strong>Имя столбца, значение которого будет регрессионно спрогнозировано</strong></p>
+          <p><input maxlength="250" size="40" id="name_column_y" value="Модуль упругости при растяжении, ГПа"></p>
+          <p><strong>Загрузите датасет в формате csv, кодировка - "UTF-8"</strong></p>
+          <p><input type="file" id="file">   </p>
+             <p>
+                 <b>Тип модели?</b>
+                <input name="model" type="radio" checked value="nn"> Нейронка
+                <input name="model" type="radio" value="rf"> Случайный лес
+                <input name="model" type="radio" value="lin" > Линейная
+             </p>
+          <p><input type="button" value="Send file" onclick="send()"></p>
+
+      </form>
+
+	 <div id="gd"></div>
+
+     <script>
+        var traces = [];
+        async function send(){
+            let xhr = new XMLHttpRequest();
+            var formData = new FormData();
+            const forma = document.getElementById("forma1");
+            const file = document.getElementById("file");
+            const y = document.getElementById("name_column_y");
+            formData.append("file", file.files[0] );
+            formData.append("name_column_y", y.value);
+
+            var radioButtons = document.getElementsByName("model");
+            var checkRadio = 0;
+            for(var i = 0; i < radioButtons.length; i++)
+            {
+                if(radioButtons[i].checked == true)
+                {
+                    checkRadio = i;
+                }
+            }
+
+            formData.append("checkRadio", checkRadio);
+            // 2. Настраиваем его: POST-запрос по URL postdata
+            xhr.open('POST', '/postdata');
+
+            // 3. Отсылаем запрос
+            xhr.send(formData);
+
+            // 4. Этот код сработает после того, как мы получим ответ сервера
+
+
+            xhr.onload = function() {
+              if (xhr.status != 200) { // анализируем HTTP-статус ответа, если статус не 200, то произошла ошибка
+                alert('Ошибка ${xhr.status}: ${xhr.statusText}'); // Например, 404: Not Found
+              } else { // если всё прошло гладко, выводим результат
+                    if (checkRadio == 0){
+                    document.getElementById("downloadNN").hidden = false;
+                    }else if (checkRadio == 1){
+                    document.getElementById("downloadRFR").hidden = false;
+                    }else{
+                    document.getElementById("downloadVoting").hidden = false;
+                    }
+
+
+					const ob = JSON.parse( xhr.response);
+					for (var tr in ob) {
+                        /*alert('Готово, получили: ' + ob[tr]["x"] + "  " + ob[tr]["y"] + "  " + ob[tr]["type"]);*/
+					    let trac = {
+							x: ob[tr]["x"],
+							y: ob[tr]["y"],
+							type: ob[tr]["type"]
+						}
+						traces.push(trac);
+					}
+					Plotly.newPlot("gd", /* JSON object */ {
+                        "data": traces,
+                        "layout": { "width": 1200, "height": 600}
+                    })
+
+				  }
+            };
+
+            xhr.onerror = function() {
+              alert("Запрос не удался");
+            };
+        }
+
+        if (traces.length == 0){
+            trace1 = {
+                x: [10, 20, 30, 40],
+                y: [10, 15, 13, 17],
+                type: 'scatter'
+            }
+
+
+            trace2 = {
+                x: [10, 20, 30, 40],
+                y: [1, 2, 4, 90],
+                type: 'scatter'
+            }
+            var data = [trace1, trace2]
+            Plotly.newPlot("gd", /* JSON object */ {
+                "data": data,
+                "layout": { "width": 1200, "height": 600}
+            })
+        }else{
+                 Plotly.newPlot("gd", /* JSON object */ {
+                "data": traces,
+                "layout": { "width": 1200, "height": 600}
+            })
+        }
+     </script>
+
+<table border=0 cellpadding=15 cellspacing=0 width=480><tr><td valign=top>
+
+    <p><a id="downloadNN" href="static/my_model.h5" download hidden>Download model</a></p>
+    <p><a id="downloadRFR" href="static/finalized_model.sav" download hidden>Download model</a></p>
+    <p><a id="downloadVoting" href="static/finalized_model_voting.sav" download hidden>Download model</a></p>
+</ul>
+<br><br>
+
+  
+<CENTER>
+<table border=0 width=100% cellspacing="0" cellpadding="0">
+<tr>
+
+</tr>
+</table>
+</CENTER>
+</td></tr></table>
+<p><font color="#00FF00"></font>&nbsp;</p>
+
+</body>
+</html>
