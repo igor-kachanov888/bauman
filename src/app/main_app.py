@@ -23,7 +23,7 @@ async def home(request: Request):
     return templates.TemplateResponse("index2.html", {"request": request})
 
 @app.post("/postdata")
-async def postdata( request: Request):  #name_column_y: str = Form(...),    file: UploadFile= Form(...),
+async def postdata( request: Request):
     form = await request.form()
     file = form["file"]
     print("name_column_y", form["name_column_y"])

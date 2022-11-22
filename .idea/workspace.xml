@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="5b607c23-db48-4311-806d-7b3ba0aa9665" name="Changes" comment="del files3" />
+    <list default="true" id="5b607c23-db48-4311-806d-7b3ba0aa9665" name="Changes" comment="del files3">
+      <change beforePath="$PROJECT_DIR$/src/app/main_app.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/main_app.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
