@@ -36,15 +36,22 @@ def get_model_for_regression_FunkAPI(input_shape = 28*28):
     #x_out = Dense(16, activation="relu")(input)
     #x_out = math.sin(Dense(16, activation="relu")(x_out))
     #x_out = Dense(16, activation="relu")(x_out)
-
+    w = Dense(36, )(input)
+    sin = Dropout(0.3)(math.sin(w))
+    cos = Dropout(0.3)(math.cos(w))
+    sin =Dropout(0.3)(Dense(36, )(sin))
+    cos = Dropout(0.3)(Dense(36, )(cos))
+    exp = Dropout(0.3)(Dense(36, activation="relu")(math.exp(-10.*(math.pow(sin + cos, 2)))))
+    '''
     x = Dense(8, activation="relu")(input)
     x1 = Dense(8, activation="relu")(x)
     x2 = Dense(8, activation="tanh")(x)
     b = Dense(8, activation="relu")(x)
-    x = Dense(8, activation="relu")(x1 * x2 + b)
-
-
-    output = Dense(1, activation="relu")(x)  #x_out +
+    x = Dense(9, activation="relu")(x1 * x2 + b)
+    
+    x = Dense(9, activation="relu")(exp)
+'''
+    output = Dense(1, activation="relu")(exp)  #x_out +
     model = keras.Model(inputs=input, outputs=output, name="funkAPI_model")
 
     model.summary()
@@ -60,7 +67,7 @@ def get_data_for_regression(df: pd.DataFrame , name_y: str ):
 
     df = df.applymap(lambda x: x.replace(",", ".") if isinstance(x, str) else x)
     df.head()
-    possible_y = ["Соотношение матрица-наполнитель", "Модуль упругости при растяжении, ГПа", "Прочность при растяжении, МПа"]
+    possible_y = ["Модуль упругости при растяжении, ГПа", "Прочность при растяжении, МПа"]
     y = df[name_y].astype("float64")
     df = df.drop(columns=possible_y )
 
@@ -77,7 +84,7 @@ def main_processing(df: pd.DataFrame = None, name_y: str= None):
         df = pd.read_csv(r"data/dataForFinal.csv")
 
     x_train, x_test, y_train,  y_test = get_data_for_regression(df, name_y)
-    model = get_model_for_regression(input_shape = x_train.shape[1])  #_FunkAPI
+    model = get_model_for_regression_FunkAPI(input_shape = x_train.shape[1])  #_FunkAPI
     batch_size = 3
     checkpoint_path = "training_2/cp-{epoch:04d}.ckpt"
     cp_callback = keras.callbacks.ModelCheckpoint(
